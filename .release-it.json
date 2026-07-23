@@ -1,0 +1,8 @@
+{
+    "hooks": {
+        "before:init": ["npm run pre-release"]
+    },
+    "npm": {
+        "publish": true
+    }
+}

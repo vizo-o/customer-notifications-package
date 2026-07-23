@@ -1,0 +1,82 @@
+{
+    "name": "@vizo-o/customer-notifications",
+    "version": "0.1.0",
+    "description": "Customer notification templates (email, SMS, WATI metadata) for Vizo systems",
+    "main": "./dist/src/index.js",
+    "types": "./dist/src/index.d.ts",
+    "bin": {
+        "notifications-compile": "./cli/compile-runner.mjs"
+    },
+    "files": [
+        "dist",
+        "cli"
+    ],
+    "exports": {
+        ".": {
+            "types": "./dist/src/index.d.ts",
+            "default": "./dist/src/index.js"
+        },
+        "./layout": {
+            "types": "./dist/src/email/layout.d.ts",
+            "default": "./dist/src/email/layout.js"
+        }
+    },
+    "scripts": {
+        "build": "tsc",
+        "watch": "tsc -w",
+        "lint": "eslint \"{src,test,cli}/**/*.{ts,tsx,mjs}\" --max-warnings=0 && prettier --check \"src/**/*.{ts,tsx,json}\" \"test/**/*.{ts,tsx,json}\" \"cli/**/*.mjs\" \"*.{json,js,mjs}\"",
+        "lint:fix": "eslint \"{src,test,cli}/**/*.{ts,tsx,mjs}\" --fix --max-warnings=0 && prettier --write \"src/**/*.{ts,tsx,json}\" \"test/**/*.{ts,tsx,json}\" \"cli/**/*.mjs\" \"*.{json,js,mjs}\"",
+        "type-check": "tsc --noEmit",
+        "test": "jest",
+        "test:watch": "jest --watch",
+        "audit:high": "npm audit --audit-level=high",
+        "pre-release": "node scripts/pre-release.mjs",
+        "release": "release-it",
+        "release:ci": "npm run pre-release && release-it --ci"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/vizo-o/customer-notifications-package.git"
+    },
+    "author": "Gilaad Elstein",
+    "license": "ISC",
+    "publishConfig": {
+        "registry": "https://npm.pkg.github.com"
+    },
+    "peerDependencies": {
+        "react": "^18.0.0 || ^19.0.0",
+        "react-dom": "^18.0.0 || ^19.0.0",
+        "zod": "^3.23.0"
+    },
+    "dependencies": {
+        "@react-email/components": "^0.0.31",
+        "@react-email/render": "^1.0.4"
+    },
+    "devDependencies": {
+        "@eslint/js": "^8.57.1",
+        "@types/jest": "^30.0.0",
+        "@types/node": "^22.13.10",
+        "@types/react": "^19.0.10",
+        "@typescript-eslint/eslint-plugin": "^8.0.0",
+        "@typescript-eslint/parser": "^8.0.0",
+        "@vizo-o/dev-tools": "^1.0.57",
+        "eslint": "^9.26.0",
+        "eslint-plugin-prettier": "^5.2.3",
+        "eslint-plugin-promise": "^6.6.0",
+        "jest": "^30.2.0",
+        "prettier": "^3.4.2",
+        "react": "^19.0.0",
+        "react-dom": "^19.0.0",
+        "release-it": "^19.0.3",
+        "ts-jest": "^29.4.5",
+        "typescript": "^5.8.2",
+        "zod": "^3.24.2",
+        "zod-to-json-schema": "^3.24.5"
+    },
+    "overrides": {
+        "lodash": ">=4.17.24",
+        "fast-xml-parser": ">=5.7.0",
+        "minimatch": ">=10.2.1",
+        "undici": ">=7.28.0 <8.0.0"
+    }
+}
