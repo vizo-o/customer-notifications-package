@@ -70,8 +70,7 @@ export interface RegisteredMessage<
             format?: 'structured'
         }
         wati?:
-            | WatiLocaleMap
-            | ((variant?: TVariant) => WatiLocaleMap | undefined)
+            WatiLocaleMap | ((variant?: TVariant) => WatiLocaleMap | undefined)
     }
 }
 

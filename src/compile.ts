@@ -129,7 +129,9 @@ export async function compileNotifications(
             (message.variants?.length ? [...message.variants] : ['default'])
 
         const previewPaths: Record<string, string> = {}
-        const resolveWatiLocales = (variant: string): WatiLocaleMap | undefined => {
+        const resolveWatiLocales = (
+            variant: string,
+        ): WatiLocaleMap | undefined => {
             const wati = message.channels.wati
             if (!wati) {
                 return undefined

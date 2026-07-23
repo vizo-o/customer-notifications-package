@@ -48,8 +48,8 @@ describe('wati-payload', () => {
 
     it('buildWatiSendPayload throws when param missing', () => {
         const spec = getWatiSpecFromPrebuilt(bundle, 'he')
-        expect(() =>
-            buildWatiSendPayload(spec, { name: 'Test User' }),
-        ).toThrow('Missing WATI parameter "vizoID"')
+        expect(() => buildWatiSendPayload(spec, { name: 'Test User' })).toThrow(
+            'Missing WATI parameter "vizoID"',
+        )
     })
 })
