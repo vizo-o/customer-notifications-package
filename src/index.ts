@@ -61,8 +61,16 @@ export type {
 export {
     loadPrebuiltEmailBundle,
     loadPrebuiltSmsBundle,
+    loadPrebuiltWatiBundle,
     resolveNotificationsPrebuiltDir,
 } from './prebuilt-loader'
+
+export {
+    buildWatiSendPayload,
+    getWatiSpecFromPrebuilt,
+    type PrebuiltWatiBundle,
+    type WatiSendPayload,
+} from './wati-payload'
 
 export { compileNotifications } from './compile'
 export type { CompileOptions, CompileResult } from './compile'

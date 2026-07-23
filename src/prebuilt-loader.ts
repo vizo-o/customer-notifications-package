@@ -2,9 +2,11 @@ import { existsSync } from 'node:fs'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import type { PrebuiltEmailBundle, PrebuiltSmsBundle } from './render'
+import type { PrebuiltWatiBundle } from './wati-payload'
 
 const emailCache = new Map<string, PrebuiltEmailBundle>()
 const smsCache = new Map<string, PrebuiltSmsBundle>()
+const watiCache = new Map<string, PrebuiltWatiBundle>()
 
 export function resolveNotificationsPrebuiltDir(
     serviceDirname: string,
@@ -81,6 +83,33 @@ export async function loadPrebuiltSmsBundle(options: {
     )
     const parsed = JSON.parse(raw) as PrebuiltSmsBundle
     smsCache.set(cacheKey, parsed)
+
+    return parsed
+}
+
+export async function loadPrebuiltWatiBundle(options: {
+    serviceDirname: string
+    messageId: string
+    variant?: string
+}): Promise<PrebuiltWatiBundle> {
+    const cacheKey = `${options.messageId}:${options.variant ?? 'default'}`
+    const cached = watiCache.get(cacheKey)
+    if (cached) {
+        return cached
+    }
+
+    const fileName = options.variant
+        ? `${options.messageId}.${options.variant}.wati.json`
+        : `${options.messageId}.wati.json`
+    const raw = await fs.readFile(
+        path.join(
+            resolveNotificationsPrebuiltDir(options.serviceDirname),
+            fileName,
+        ),
+        'utf8',
+    )
+    const parsed = JSON.parse(raw) as PrebuiltWatiBundle
+    watiCache.set(cacheKey, parsed)
 
     return parsed
 }

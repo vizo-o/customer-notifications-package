@@ -35,7 +35,11 @@ export function defineMessage<
     }
 
     if (definition.channels.wati) {
-        const locales = Object.keys(definition.channels.wati)
+        const wati = definition.channels.wati
+        const locales =
+            typeof wati === 'function'
+                ? Object.keys(wati(undefined) ?? {})
+                : Object.keys(wati)
         if (locales.length === 0) {
             throw new Error(
                 `Message "${definition.id}" WATI channel must define at least one locale`,

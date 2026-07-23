@@ -69,7 +69,9 @@ export interface RegisteredMessage<
                 | ((params: TParams, variant?: TVariant) => LocalizedSmsBodies)
             format?: 'structured'
         }
-        wati?: WatiLocaleMap
+        wati?:
+            | WatiLocaleMap
+            | ((variant?: TVariant) => WatiLocaleMap | undefined)
     }
 }
 

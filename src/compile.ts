@@ -7,6 +7,7 @@ import type {
     CompileManifestEntry,
     RegisteredMessage,
     SupportedLanguage,
+    WatiLocaleMap,
 } from './types'
 import { getDefaultAssetBaseUrl } from './sms'
 import { renderEmail, renderSmsMessage } from './render'
@@ -61,6 +62,16 @@ const SAMPLE_DEFAULTS: Record<string, Record<string, unknown>> = {
         approvalLink:
             'https://affiliate.sparkles-adhd.com/dataSharingEmailApproval/sample-token',
         agreementUrl: 'https://www.sparkles-adhd.com/info-sharing-agreement',
+    },
+    'product-journey.link': {
+        customerName: 'Sample Customer',
+        vizoId: 'Vi-000001',
+        portalUrl: 'https://md.sparkles-adhd.com/sign-in/Vi-000001',
+    },
+    'product-journey.link.external-optics': {
+        customerName: 'Sample Customer',
+        vizoId: 'Vi-000001',
+        portalUrl: 'https://md.sparkles-adhd.com/dashboard',
     },
 }
 
@@ -118,8 +129,22 @@ export async function compileNotifications(
             (message.variants?.length ? [...message.variants] : ['default'])
 
         const previewPaths: Record<string, string> = {}
+        const resolveWatiLocales = (variant: string): WatiLocaleMap | undefined => {
+            const wati = message.channels.wati
+            if (!wati) {
+                return undefined
+            }
+
+            if (typeof wati === 'function') {
+                return wati(
+                    variant !== 'default' ? (variant as never) : undefined,
+                )
+            }
+
+            return wati
+        }
         const watiAvailableLocales = getWatiAvailableLocales(
-            message.channels.wati,
+            resolveWatiLocales(variantList[0] ?? 'default'),
         )
         const prebuiltTarget = options.prebuiltOutputs?.find(
             (entry) => entry.messageId === message.id,
@@ -235,8 +260,13 @@ export async function compileNotifications(
             }
 
             if (includePreview && message.channels.wati) {
-                for (const locale of watiAvailableLocales) {
-                    const spec = message.channels.wati[locale]
+                const watiLocales = resolveWatiLocales(variant)
+                if (!watiLocales) {
+                    continue
+                }
+
+                for (const locale of getWatiAvailableLocales(watiLocales)) {
+                    const spec = watiLocales[locale]
                     if (!spec) {
                         continue
                     }
@@ -470,6 +500,63 @@ export async function compileNotifications(
                     SAMPLE_DEFAULTS[message.id] ??
                     {}
                 await writeEmailPrebuilt('default', baseSampleParams)
+            }
+        }
+
+        if (!skipPrebuilt && message.channels.wati) {
+            const prebuiltDir =
+                options.prebuiltDir ??
+                path.join(options.repoRoot, 'notifications/prebuilt')
+
+            const writeWatiPrebuilt = async (
+                variant: string,
+                watiLocales: WatiLocaleMap,
+            ) => {
+                const bundle = {
+                    id: message.id,
+                    variant: variant === 'default' ? undefined : variant,
+                    locales: watiLocales,
+                }
+
+                const fileName =
+                    variant === 'default'
+                        ? `${message.id}.wati.json`
+                        : `${message.id}.${variant}.wati.json`
+
+                await fs.mkdir(prebuiltDir, { recursive: true })
+                await fs.writeFile(
+                    path.join(prebuiltDir, fileName),
+                    JSON.stringify(bundle, null, 2),
+                    'utf8',
+                )
+            }
+
+            if (variantList.length > 1 && message.variants?.length) {
+                await Promise.all(
+                    variantList.map(async (variant) => {
+                        const watiForVariant =
+                            typeof message.channels.wati === 'function'
+                                ? message.channels.wati(
+                                      variant !== 'default'
+                                          ? (variant as never)
+                                          : undefined,
+                                  )
+                                : message.channels.wati
+
+                        if (watiForVariant) {
+                            await writeWatiPrebuilt(variant, watiForVariant)
+                        }
+                    }),
+                )
+            } else if (message.channels.wati) {
+                const watiLocales =
+                    typeof message.channels.wati === 'function'
+                        ? message.channels.wati(undefined)
+                        : message.channels.wati
+
+                if (watiLocales) {
+                    await writeWatiPrebuilt('default', watiLocales)
+                }
             }
         }
     }

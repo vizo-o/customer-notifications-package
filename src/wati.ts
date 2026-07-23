@@ -17,8 +17,23 @@ export function getWatiAvailableLocales(
 export function getWatiSpec(
     message: RegisteredMessage,
     locale: SupportedLanguage,
+    variant?: string,
 ): WatiLocaleSpec {
-    const wati = message.channels.wati
+    const watiChannel = message.channels.wati
+    if (!watiChannel) {
+        throw new WatiLocaleNotAvailableError({
+            bundleId: message.id,
+            requestedLocale: locale,
+            availableLocales: [],
+            reason: 'no_wati_channel',
+        })
+    }
+
+    const wati =
+        typeof watiChannel === 'function'
+            ? watiChannel(variant as never)
+            : watiChannel
+
     if (!wati) {
         throw new WatiLocaleNotAvailableError({
             bundleId: message.id,

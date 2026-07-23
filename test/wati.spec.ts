@@ -25,9 +25,13 @@ const testMessage = defineMessage({
 
 describe('WATI locale helpers', () => {
     it('returns available locales', () => {
-        expect(getWatiAvailableLocales(testMessage.channels.wati)).toEqual([
-            'he',
-        ])
+        expect(
+            getWatiAvailableLocales(
+                typeof testMessage.channels.wati === 'function'
+                    ? testMessage.channels.wati(undefined)
+                    : testMessage.channels.wati,
+            ),
+        ).toEqual(['he'])
         expect(getWatiAvailableLocales(undefined)).toEqual([])
     })
 
