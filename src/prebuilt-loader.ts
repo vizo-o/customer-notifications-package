@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import type { PrebuiltEmailBundle, PrebuiltSmsBundle } from './render'
@@ -11,6 +12,20 @@ export function resolveNotificationsPrebuiltDir(
     const configured = process.env.NOTIFICATIONS_PREBUILT_DIR?.trim()
     if (configured) {
         return configured
+    }
+
+    let current = path.resolve(serviceDirname)
+    for (let depth = 0; depth < 8; depth++) {
+        const candidate = path.join(current, 'notifications', 'prebuilt')
+        if (existsSync(candidate)) {
+            return candidate
+        }
+
+        const parent = path.dirname(current)
+        if (parent === current) {
+            break
+        }
+        current = parent
     }
 
     return path.join(serviceDirname, '../../../notifications/prebuilt')
