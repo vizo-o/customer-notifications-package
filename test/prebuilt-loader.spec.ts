@@ -16,9 +16,9 @@ describe('resolveNotificationsPrebuiltDir', () => {
 
     it('prefers NOTIFICATIONS_PREBUILT_DIR when set', () => {
         process.env.NOTIFICATIONS_PREBUILT_DIR = '/custom/prebuilt'
-        expect(
-            resolveNotificationsPrebuiltDir('/any/service/dir'),
-        ).toBe('/custom/prebuilt')
+        expect(resolveNotificationsPrebuiltDir('/any/service/dir')).toBe(
+            '/custom/prebuilt',
+        )
     })
 
     it('finds prebuilt when service is under dist/notifications', () => {
