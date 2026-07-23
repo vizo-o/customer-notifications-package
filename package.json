@@ -1,6 +1,6 @@
 {
     "name": "@vizo-o/customer-notifications",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "description": "Customer notification templates (email, SMS, WATI metadata) for Vizo systems",
     "main": "./dist/src/index.js",
     "types": "./dist/src/index.d.ts",
@@ -27,9 +27,10 @@
         "lint": "eslint \"{src,test,cli}/**/*.{ts,tsx,mjs}\" --max-warnings=0 && prettier --check \"src/**/*.{ts,tsx,json}\" \"test/**/*.{ts,tsx,json}\" \"cli/**/*.mjs\" \"*.{json,js,mjs}\"",
         "lint:fix": "eslint \"{src,test,cli}/**/*.{ts,tsx,mjs}\" --fix --max-warnings=0 && prettier --write \"src/**/*.{ts,tsx,json}\" \"test/**/*.{ts,tsx,json}\" \"cli/**/*.mjs\" \"*.{json,js,mjs}\"",
         "type-check": "tsc --noEmit",
-        "test": "jest",
-        "test:watch": "jest --watch",
+        "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+        "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
         "audit:high": "npm audit --audit-level=high",
+        "prepublishOnly": "node scripts/prepublish-only.mjs",
         "pre-release": "node scripts/pre-release.mjs",
         "release": "release-it",
         "release:ci": "npm run pre-release && release-it --ci"
@@ -50,7 +51,8 @@
     },
     "dependencies": {
         "@react-email/components": "^0.0.31",
-        "@react-email/render": "^1.0.4"
+        "@react-email/render": "^1.0.4",
+        "zod-to-json-schema": "^3.24.5"
     },
     "devDependencies": {
         "@eslint/js": "^8.57.1",
@@ -70,8 +72,7 @@
         "release-it": "^19.0.3",
         "ts-jest": "^29.4.5",
         "typescript": "^5.8.2",
-        "zod": "^3.24.2",
-        "zod-to-json-schema": "^3.24.5"
+        "zod": "^3.24.2"
     },
     "overrides": {
         "lodash": ">=4.17.24",

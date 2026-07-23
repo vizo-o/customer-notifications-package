@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
- * Runs `tsc` only when customer-notifications-package src changed.
+ * Ensures @vizo-o/customer-notifications dist is available before compile.
+ * Published installs ship prebuilt dist; local package dev runs tsc when src changes.
  */
 import crypto from 'node:crypto'
 import fs from 'node:fs/promises'
@@ -15,9 +16,15 @@ const packageRoot = path.join(
     path.dirname(fileURLToPath(import.meta.url)),
     '..',
 )
-const srcDir = path.join(packageRoot, 'src')
-const distEntry = path.join(packageRoot, 'dist', 'src', 'index.js')
-const stampPath = path.join(packageRoot, BUILD_STAMP_FILE)
+
+async function pathExists(candidate) {
+    try {
+        await fs.access(candidate)
+        return true
+    } catch {
+        return false
+    }
+}
 
 async function hashFileContent(hasher, filePath) {
     const content = await fs.readFile(filePath)
@@ -47,6 +54,7 @@ async function walkAndHash(dir, hasher) {
 
 async function computeSrcHash() {
     const hasher = crypto.createHash('sha256')
+    const srcDir = path.join(packageRoot, 'src')
     const packageJson = JSON.parse(
         await fs.readFile(path.join(packageRoot, 'package.json'), 'utf8'),
     )
@@ -59,7 +67,10 @@ async function computeSrcHash() {
 
 async function readBuildStamp() {
     try {
-        const raw = await fs.readFile(stampPath, 'utf8')
+        const raw = await fs.readFile(
+            path.join(packageRoot, BUILD_STAMP_FILE),
+            'utf8',
+        )
 
         return JSON.parse(raw)
     } catch {
@@ -68,8 +79,10 @@ async function readBuildStamp() {
 }
 
 async function main() {
-    const srcHash = await computeSrcHash()
-    const existingStamp = await readBuildStamp()
+    const distEntry = path.join(packageRoot, 'dist', 'src', 'index.js')
+    const hasBuildableSources =
+        (await pathExists(path.join(packageRoot, 'tsconfig.json'))) &&
+        (await pathExists(path.join(packageRoot, 'src')))
 
     let distExists = false
     try {
@@ -78,6 +91,23 @@ async function main() {
     } catch {
         distExists = false
     }
+
+    if (!hasBuildableSources) {
+        if (distExists) {
+            console.log(
+                'Using prebuilt @vizo-o/customer-notifications dist from npm',
+            )
+            return
+        }
+
+        console.error(
+            'Missing @vizo-o/customer-notifications dist. Reinstall the package.',
+        )
+        process.exit(1)
+    }
+
+    const srcHash = await computeSrcHash()
+    const existingStamp = await readBuildStamp()
 
     if (
         existingStamp?.srcHash === srcHash &&
@@ -99,7 +129,7 @@ async function main() {
     }
 
     await fs.writeFile(
-        stampPath,
+        path.join(packageRoot, BUILD_STAMP_FILE),
         `${JSON.stringify(
             {
                 srcHash,

@@ -2,10 +2,10 @@
 module.exports = {
     preset: 'ts-jest',
     testEnvironment: 'node',
-    testMatch: ['**/test/**/*.spec.ts'],
-    moduleFileExtensions: ['ts', 'js', 'json'],
+    testMatch: ['**/test/**/*.spec.ts', '**/test/**/*.spec.tsx'],
+    moduleFileExtensions: ['ts', 'tsx', 'js', 'json'],
     transform: {
-        '^.+\\.ts$': [
+        '^.+\\.tsx?$': [
             'ts-jest',
             {
                 tsconfig: {

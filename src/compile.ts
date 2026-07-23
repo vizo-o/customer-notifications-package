@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
+import { createRequire } from 'node:module'
 import { zodToJsonSchema } from 'zod-to-json-schema'
 import type {
     CompileManifest,
@@ -76,6 +77,20 @@ function injectPlaceholders(
     }
 
     return result
+}
+
+function resolveDefaultFrameworkRoot(repoRoot: string): string {
+    const requireFromCompile = createRequire(__filename)
+
+    try {
+        return path.dirname(
+            requireFromCompile.resolve(
+                '@vizo-o/customer-notifications/package.json',
+            ),
+        )
+    } catch {
+        return path.join(repoRoot, '../../customer-notifications-package')
+    }
 }
 
 export async function compileNotifications(
@@ -483,7 +498,7 @@ export async function compileNotifications(
     if (!skipPrebuilt) {
         const frameworkRoot =
             options.frameworkRoot ??
-            path.join(options.repoRoot, '../../customer-notifications-package')
+            resolveDefaultFrameworkRoot(options.repoRoot)
         const frameworkVersion =
             options.frameworkVersion ??
             JSON.parse(

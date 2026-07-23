@@ -58,6 +58,12 @@ export type {
     PrebuiltSmsBundle,
 } from './render'
 
+export {
+    loadPrebuiltEmailBundle,
+    loadPrebuiltSmsBundle,
+    resolveNotificationsPrebuiltDir,
+} from './prebuilt-loader'
+
 export { compileNotifications } from './compile'
 export type { CompileOptions, CompileResult } from './compile'
 

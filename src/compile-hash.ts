@@ -139,11 +139,15 @@ export async function computeCompileInputsHash(
         NOTIFICATION_SOURCE_EXTENSIONS,
     )
 
-    await walkAndHash(
-        path.join(inputs.frameworkRoot, 'src'),
-        hasher,
-        FRAMEWORK_SOURCE_EXTENSIONS,
-    )
+    const frameworkSrc = path.join(inputs.frameworkRoot, 'src')
+    const frameworkDist = path.join(inputs.frameworkRoot, 'dist', 'src')
+
+    try {
+        await fs.access(path.join(frameworkSrc, 'index.ts'))
+        await walkAndHash(frameworkSrc, hasher, FRAMEWORK_SOURCE_EXTENSIONS)
+    } catch {
+        await walkAndHash(frameworkDist, hasher, new Set(['.js', '.d.ts']))
+    }
 
     return hasher.digest('hex')
 }

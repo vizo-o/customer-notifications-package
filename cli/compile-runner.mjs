@@ -10,12 +10,14 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { spawnSync } from 'node:child_process'
+import { createRequire } from 'node:module'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const frameworkRoot = path.join(
     path.dirname(fileURLToPath(import.meta.url)),
     '..',
 )
+const frameworkRequire = createRequire(path.join(frameworkRoot, 'package.json'))
 
 function parseArgs(argv) {
     const force = argv.includes('--force')
@@ -44,22 +46,41 @@ async function verifyMessageSourcesUtf8(repoRoot) {
         return
     }
 
-    const verifyScript = path.join(
-        repoRoot,
-        '..',
-        'dev-tools',
-        '.cursor',
-        'skills',
-        'unicode-text-editing',
-        'scripts',
-        'verify-utf8-text.py',
-    )
+    const verifyScriptCandidates = [
+        path.join(
+            repoRoot,
+            '../../dev-tools',
+            '.cursor',
+            'skills',
+            'unicode-text-editing',
+            'scripts',
+            'verify-utf8-text.py',
+        ),
+        path.join(
+            repoRoot,
+            '../dev-tools',
+            '.cursor',
+            'skills',
+            'unicode-text-editing',
+            'scripts',
+            'verify-utf8-text.py',
+        ),
+    ]
 
-    try {
-        await fs.access(verifyScript)
-    } catch {
+    let verifyScript
+    for (const candidate of verifyScriptCandidates) {
+        try {
+            await fs.access(candidate)
+            verifyScript = candidate
+            break
+        } catch {
+            continue
+        }
+    }
+
+    if (!verifyScript) {
         console.warn(
-            `Skipping UTF-8 verify (script not found): ${verifyScript}`,
+            `Skipping UTF-8 verify (script not found under ${repoRoot})`,
         )
         return
     }
@@ -111,9 +132,9 @@ async function main() {
         process.exit(1)
     }
 
-    const { compileNotifications } = await import('../dist/src/compile.js')
+    const { compileNotifications } = frameworkRequire('./dist/src/compile.js')
     const { computeCompileInputsHash, getCompileStampPath, readCompileStamp } =
-        await import('../dist/src/compile-hash.js')
+        frameworkRequire('./dist/src/compile-hash.js')
 
     const frameworkVersion = await loadFrameworkVersion()
     const options = await loadConfig({ repoRoot })

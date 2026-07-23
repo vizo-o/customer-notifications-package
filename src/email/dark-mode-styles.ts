@@ -4,17 +4,11 @@ export const SPARKLES_EMAIL_DARK_SHELL = '#111827'
 /** Card surface in client dark mode (Outlook.com, Apple Mail, etc.). */
 export const SPARKLES_EMAIL_DARK_CARD = '#1f2937'
 
-const LOGO_WIDTH = 189
-const LOGO_HEIGHT = 29
-
 const LIGHT_LOGO_HIDE = `
         display: none !important;
         max-height: 0 !important;
         overflow: hidden !important;
         mso-hide: all !important;
-        width: 0 !important;
-        height: 0 !important;
-        max-width: 0 !important;
 `
 
 const LIGHT_LOGO_SHOW = `
@@ -22,9 +16,12 @@ const LIGHT_LOGO_SHOW = `
         max-height: none !important;
         overflow: visible !important;
         margin-bottom: 16px !important;
-        width: ${LOGO_WIDTH}px !important;
-        height: ${LOGO_HEIGHT}px !important;
-        max-width: ${LOGO_WIDTH}px !important;
+`
+
+const DARK_LOGO_SHOW = `
+        ${LIGHT_LOGO_SHOW}
+        height: 29px !important;
+        width: auto !important;
 `
 
 /**
@@ -89,7 +86,7 @@ export const SPARKLES_EMAIL_DARK_MODE_STYLES = `
         .email-logo-dark,
         [class*="email-logo-dark"],
         img[class*="email-logo-dark"] {
-            ${LIGHT_LOGO_SHOW}
+            ${DARK_LOGO_SHOW}
         }
         .email-button,
         [class*="email-button"] {
@@ -146,7 +143,7 @@ export const SPARKLES_EMAIL_DARK_MODE_STYLES = `
     }
     [data-ogsb] [class*="email-logo-dark"],
     [data-ogsb] img[class*="email-logo-dark"] {
-        ${LIGHT_LOGO_SHOW}
+        ${DARK_LOGO_SHOW}
     }
     [data-ogsb] [class*="email-button"] {
         background-color: #0066cc !important;

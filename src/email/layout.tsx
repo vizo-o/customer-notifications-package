@@ -3,16 +3,11 @@ import {
     Container,
     Head,
     Html,
-    Preview,
+    Img,
     Section,
     Text,
 } from '@react-email/components'
-import type {
-    ComponentProps,
-    CSSProperties,
-    ImgHTMLAttributes,
-    ReactNode,
-} from 'react'
+import type { ComponentProps, CSSProperties, ReactNode } from 'react'
 import type { EmailTheme, SupportedLanguage } from '../types'
 import { languageDirection } from '../language'
 import {
@@ -46,14 +41,7 @@ function logoUrl(assetBaseUrl: string, theme: EmailTheme): string {
     return `${assetBaseUrl.replace(/\/$/, '')}/brand/${file}`
 }
 
-const SPARKLES_LOGO_WIDTH = 189
 const SPARKLES_LOGO_HEIGHT = 29
-
-const logoDimensionStyle = (): OutlookStyle => ({
-    width: `${SPARKLES_LOGO_WIDTH}px`,
-    height: `${SPARKLES_LOGO_HEIGHT}px`,
-    maxWidth: `${SPARKLES_LOGO_WIDTH}px`,
-})
 
 function hiddenLogoStyle(): OutlookStyle {
     return {
@@ -61,9 +49,6 @@ function hiddenLogoStyle(): OutlookStyle {
         maxHeight: 0,
         overflow: 'hidden',
         marginBottom: 0,
-        width: 0,
-        height: 0,
-        maxWidth: 0,
         msoHide: 'all',
     }
 }
@@ -72,7 +57,7 @@ function visibleLogoStyle(): OutlookStyle {
     return {
         display: 'block',
         marginBottom: '16px',
-        ...logoDimensionStyle(),
+        height: `${SPARKLES_LOGO_HEIGHT}px`,
     }
 }
 
@@ -87,48 +72,6 @@ function logoImgStyle(
     return isVisible ? visibleLogoStyle() : hiddenLogoStyle()
 }
 
-function logoImgDimensions(
-    variant: 'light' | 'dark',
-    theme: EmailTheme,
-): { width: number; height: number } {
-    const isVisible =
-        (theme === 'light' && variant === 'light') ||
-        (theme === 'dark' && variant === 'dark')
-
-    return isVisible
-        ? {
-              width: SPARKLES_LOGO_WIDTH,
-              height: SPARKLES_LOGO_HEIGHT,
-          }
-        : { width: 0, height: 0 }
-}
-
-function SparklesLogoImg(props: {
-    className: string
-    src: string
-    width: number
-    height: number
-    style: OutlookStyle
-}) {
-    const imgProps = {
-        className: props.className,
-        src: props.src,
-        alt: 'SPARKLES',
-        width: props.width,
-        height: props.height,
-        norescale: 'norescale',
-        style: {
-            display: 'block',
-            outline: 'none',
-            border: 'none',
-            textDecoration: 'none',
-            ...props.style,
-        },
-    } as ImgHTMLAttributes<HTMLImageElement>
-
-    return <img {...imgProps} />
-}
-
 function SparklesLogoSection(props: {
     assetBaseUrl: string
     theme: EmailTheme
@@ -136,62 +79,47 @@ function SparklesLogoSection(props: {
     const lightSrc = logoUrl(props.assetBaseUrl, 'light')
     const darkSrc = logoUrl(props.assetBaseUrl, 'dark')
 
-    const lightDimensions = logoImgDimensions('light', props.theme)
-    const darkDimensions = logoImgDimensions('dark', props.theme)
-    const msoLogo = `<!--[if mso]><img src="${lightSrc}" alt="SPARKLES" width="${SPARKLES_LOGO_WIDTH}" height="${SPARKLES_LOGO_HEIGHT}" norescale="norescale" style="display:block;width:${SPARKLES_LOGO_WIDTH}px;height:${SPARKLES_LOGO_HEIGHT}px;max-width:${SPARKLES_LOGO_WIDTH}px;margin-bottom:16px;" /><![endif]-->`
+    const msoLogo = `<!--[if mso]><img src="${lightSrc}" alt="SPARKLES" height="${SPARKLES_LOGO_HEIGHT}" style="display:block;margin-bottom:16px;" /><![endif]-->`
 
     return (
-        <table
-            role='presentation'
-            cellPadding={0}
-            cellSpacing={0}
-            border={0}
-            width={SPARKLES_LOGO_WIDTH}
+        <>
+            <div dangerouslySetInnerHTML={{ __html: msoLogo }} />
+            <div
+                dangerouslySetInnerHTML={{ __html: '<!--[if !mso]><!-- -->' }}
+            />
+            <Img
+                className='email-logo-light'
+                src={lightSrc}
+                alt='SPARKLES'
+                height={SPARKLES_LOGO_HEIGHT}
+                style={logoImgStyle('light', props.theme)}
+            />
+            <Img
+                className='email-logo-dark'
+                src={darkSrc}
+                alt='SPARKLES'
+                height={SPARKLES_LOGO_HEIGHT}
+                style={logoImgStyle('dark', props.theme)}
+            />
+            <div dangerouslySetInnerHTML={{ __html: '<!--<![endif]-->' }} />
+        </>
+    )
+}
+
+function SparklesEmailPreview(props: { text: string }) {
+    return (
+        <div
             style={{
-                width: `${SPARKLES_LOGO_WIDTH}px`,
-                maxWidth: `${SPARKLES_LOGO_WIDTH}px`,
+                display: 'none',
+                overflow: 'hidden',
+                lineHeight: '1px',
+                opacity: 0,
+                maxHeight: 0,
+                maxWidth: 0,
             }}
         >
-            <tbody>
-                <tr>
-                    <td
-                        width={SPARKLES_LOGO_WIDTH}
-                        style={{
-                            width: `${SPARKLES_LOGO_WIDTH}px`,
-                            maxWidth: `${SPARKLES_LOGO_WIDTH}px`,
-                            lineHeight: `${SPARKLES_LOGO_HEIGHT}px`,
-                            fontSize: 0,
-                        }}
-                    >
-                        <div dangerouslySetInnerHTML={{ __html: msoLogo }} />
-                        <div
-                            dangerouslySetInnerHTML={{
-                                __html: '<!--[if !mso]><!-- -->',
-                            }}
-                        />
-                        <SparklesLogoImg
-                            className='email-logo-light'
-                            src={lightSrc}
-                            width={lightDimensions.width}
-                            height={lightDimensions.height}
-                            style={logoImgStyle('light', props.theme)}
-                        />
-                        <SparklesLogoImg
-                            className='email-logo-dark'
-                            src={darkSrc}
-                            width={darkDimensions.width}
-                            height={darkDimensions.height}
-                            style={logoImgStyle('dark', props.theme)}
-                        />
-                        <div
-                            dangerouslySetInnerHTML={{
-                                __html: '<!--<![endif]-->',
-                            }}
-                        />
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+            {props.text}
+        </div>
     )
 }
 
@@ -219,7 +147,7 @@ export function SparklesEmailLayout({
                 <meta name='supported-color-schemes' content='light dark' />
                 <style>{SPARKLES_EMAIL_DARK_MODE_STYLES}</style>
             </Head>
-            {previewText ? <Preview>{previewText}</Preview> : null}
+            {previewText ? <SparklesEmailPreview text={previewText} /> : null}
             <Body
                 className='email-bg'
                 style={{

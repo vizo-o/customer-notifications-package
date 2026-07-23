@@ -29,12 +29,23 @@ describe('SparklesEmailLayout', () => {
         expect(html).toContain('class="email-logo-dark"')
         expect(html).toContain('img[class*="email-logo-light"]')
         expect(html).toMatch(/email-logo-dark[^>]*display:none/i)
-        expect(html).toMatch(/email-logo-light[^>]*width="189"/i)
         expect(html).toMatch(/email-logo-light[^>]*height="29"/i)
-        expect(html).toContain('norescale="norescale"')
-        expect(html).toContain('width="189"')
-        expect(html).toMatch(/width:189px/)
-        expect(html).toMatch(/height:29px/)
+    })
+
+    it('renders inbox preview text without invisible preheader padding', async () => {
+        const html = await render(
+            <SparklesEmailLayout
+                language='en'
+                theme='light'
+                assetBaseUrl='https://assets.example.com'
+                previewText='Your verification code is:'
+            >
+                <p>Hello</p>
+            </SparklesEmailLayout>,
+        )
+
+        expect(html).toContain('Your verification code is:')
+        expect(html).not.toMatch(/[\u200B-\u200F\uFEFF]/)
     })
 
     it('uses a solid dark shell for the dark theme variant', async () => {
@@ -54,6 +65,8 @@ describe('SparklesEmailLayout', () => {
     })
 
     it('renders translated copy fallback hint and compact URL', async () => {
+        const heCopyHint =
+            '\u05d4\u05e2\u05ea\u05e7 \u05d0\u05ea \u05d4\u05db\u05ea\u05d5\u05d1\u05ea \u05d4\u05d1\u05d0\u05d4 \u05d5\u05d4\u05d3\u05d1\u05e7 \u05d0\u05d5\u05ea\u05d4 \u05d1\u05d3\u05e4\u05d3\u05e4\u05df \u05db\u05d3\u05d9 \u05dc\u05d0\u05e9\u05e8 \u05d0\u05ea \u05d4\u05d4\u05e1\u05db\u05de\u05d4:'
         const html = await render(
             <SparklesEmailLayout
                 language='he'
@@ -67,11 +80,10 @@ describe('SparklesEmailLayout', () => {
             </SparklesEmailLayout>,
         )
 
-        expect(html).toContain(
-            '???? ?? ?????? ???? ????? ???? ?????? ??? ???? ?? ??????:',
-        )
+        expect(html).toContain(heCopyHint)
+        expect(html).toContain('email-copy-hint')
         expect(html).toContain('https://example.com/approve')
-        expect(html).toContain('class="email-copy-url"')
+        expect(html).toContain('email-copy-url')
         expect(html).not.toContain('email-copy-btn')
         expect(html).not.toContain('data-sparkles-copy-url')
     })

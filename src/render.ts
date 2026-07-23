@@ -9,6 +9,10 @@ import { NotificationParamValidationError } from './errors'
 import { parseMessageParams } from './define-message'
 import { resolveFromAddress } from './sms'
 import { formatSms, substituteParams } from './sms'
+import {
+    sanitizeHtmlEmailBody,
+    sanitizePlainTextEmailBody,
+} from './email-sanitize'
 
 export async function renderEmail<
     TParams extends Record<string, unknown>,
@@ -44,8 +48,10 @@ export async function renderEmail<
         assetBaseUrl: options.assetBaseUrl,
     })
 
-    const htmlBody = await render(element)
-    const textBody = await render(element, { plainText: true })
+    const htmlBody = sanitizeHtmlEmailBody(await render(element))
+    const textBody = sanitizePlainTextEmailBody(
+        await render(element, { plainText: true }),
+    )
     const subject = emailChannel.subjects[options.language]
 
     return {

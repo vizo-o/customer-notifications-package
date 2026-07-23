@@ -1,8 +1,7 @@
 {
     "hooks": {
-        "before:init": ["npm run pre-release"]
-    },
-    "npm": {
-        "publish": true
+        "before:init": ["npm run pre-release"],
+        "before:npm:release": ["node scripts/mark-release-it-publish.mjs"],
+        "after:npm:release": ["node scripts/unmark-release-it-publish.mjs"]
     }
 }
