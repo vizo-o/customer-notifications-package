@@ -24,8 +24,8 @@
     "scripts": {
         "build": "tsc",
         "watch": "tsc -w",
-        "lint": "eslint \"{src,test,cli}/**/*.{ts,tsx,mjs}\" --max-warnings=0 && prettier --check \"src/**/*.{ts,tsx,json}\" \"test/**/*.{ts,tsx,json}\" \"cli/**/*.mjs\" \"*.{json,js,mjs}\"",
-        "lint:fix": "eslint \"{src,test,cli}/**/*.{ts,tsx,mjs}\" --fix --max-warnings=0 && prettier --write \"src/**/*.{ts,tsx,json}\" \"test/**/*.{ts,tsx,json}\" \"cli/**/*.mjs\" \"*.{json,js,mjs}\"",
+        "lint": "oxlint src test -c node_modules/@vizo-o/dev-tools/oxlint-config/oxlintrc.node.json",
+        "lint:fix": "oxlint src test -c node_modules/@vizo-o/dev-tools/oxlint-config/oxlintrc.node.json --fix",
         "type-check": "tsc --noEmit",
         "test": "NODE_OPTIONS=--experimental-vm-modules jest",
         "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
@@ -33,7 +33,9 @@
         "prepublishOnly": "node scripts/prepublish-only.mjs",
         "pre-release": "node scripts/pre-release.mjs",
         "release": "release-it",
-        "release:ci": "npm run pre-release && release-it --ci"
+        "release:ci": "npm run pre-release && release-it --ci",
+        "typecheck": "tsc --noEmit",
+        "typecheck:native": "tsgo --noEmit 2>/dev/null || tsc --noEmit"
     },
     "repository": {
         "type": "git",
@@ -55,23 +57,19 @@
         "zod-to-json-schema": "^3.24.5"
     },
     "devDependencies": {
-        "@eslint/js": "^8.57.1",
         "@types/jest": "^30.0.0",
         "@types/node": "^22.13.10",
         "@types/react": "^19.0.10",
-        "@typescript-eslint/eslint-plugin": "^8.0.0",
-        "@typescript-eslint/parser": "^8.0.0",
-        "@vizo-o/dev-tools": "^1.0.59",
-        "eslint": "^9.26.0",
-        "eslint-plugin-prettier": "^5.2.3",
-        "eslint-plugin-promise": "^6.6.0",
+        "@typescript/native-preview": "^7.0.0-dev",
+        "@vizo-o/dev-tools": "^1.0.61",
         "jest": "^30.2.0",
+        "oxlint": "^1.75.0",
         "prettier": "^3.4.2",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
         "release-it": "^19.0.3",
         "ts-jest": "^29.4.5",
-        "typescript": "^5.8.2",
+        "typescript": "~5.8.2",
         "zod": "^3.24.2"
     },
     "overrides": {
