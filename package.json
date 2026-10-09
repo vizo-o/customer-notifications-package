@@ -80,6 +80,7 @@
         "undici": ">=7.30.0 <8.0.0",
         "js-yaml": ">=5.2.2",
         "basic-ftp": "6.2.2",
-        "@grpc/grpc-js": ">=1.14.5"
+        "@grpc/grpc-js": ">=1.14.5",
+        "handlebars": "4.7.10"
     }
 }
