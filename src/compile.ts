@@ -73,6 +73,11 @@ const SAMPLE_DEFAULTS: Record<string, Record<string, unknown>> = {
         vizoId: 'Vi-000001',
         portalUrl: 'https://md.sparkles-adhd.com/dashboard',
     },
+    'product-journey.link.online': {
+        customerName: 'Sample Customer',
+        vizoId: 'Vi-000001',
+        portalUrl: 'https://md.sparkles-adhd.com/sign-in/Vi-000001',
+    },
 }
 
 function injectPlaceholders(
